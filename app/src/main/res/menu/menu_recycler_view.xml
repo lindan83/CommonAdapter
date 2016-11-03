@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.zhy.sample.RecyclerViewActivity">
+    <item
+        android:id="@+id/action_grid"
+        android:orderInCategory="100"
+        android:title="GridLayoutManager"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_staggered"
+        android:orderInCategory="100"
+        android:title="StaggeredGridLayoutManager"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_linear"
+        android:orderInCategory="100"
+        android:title="LinearLayoutManager"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_clear_data"
+        android:orderInCategory="100"
+        android:title="Clear Data"
+        app:showAsAction="never"/>
+</menu>
