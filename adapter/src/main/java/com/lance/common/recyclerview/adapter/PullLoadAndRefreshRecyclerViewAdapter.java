@@ -33,10 +33,10 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
     private static final int ITEMS_START = Integer.MIN_VALUE + 20000;
     private static final int ADAPTER_MAX_TYPES = 100;
 
-    private RecyclerView.Adapter mWrappedAdapter;
-    private List<View> mHeaderViews;
-    private List<View> mFooterViews;
-    private Map<Class, Integer> mItemTypesOffset;
+    private RecyclerView.Adapter wrappedAdapter;
+    private List<View> headerViews;
+    private List<View> footerViews;
+    private Map<Class, Integer> itemTypesOffset;
 
     /**
      * Construct a new header view recycler adapter
@@ -44,9 +44,9 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
      * @param adapter The underlying adapter to wrap
      */
     public PullLoadAndRefreshRecyclerViewAdapter(RecyclerView.Adapter adapter) {
-        mHeaderViews = new ArrayList<>();
-        mFooterViews = new ArrayList<>();
-        mItemTypesOffset = new HashMap<>();
+        headerViews = new ArrayList<>();
+        footerViews = new ArrayList<>();
+        itemTypesOffset = new HashMap<>();
         setWrappedAdapter(adapter);
     }
 
@@ -56,11 +56,11 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
      * @param adapter The new adapter to wrap
      */
     public void setAdapter(RecyclerView.Adapter adapter) {
-        if (mWrappedAdapter != null && mWrappedAdapter.getItemCount() > 0) {
-            notifyItemRangeRemoved(getHeaderCount(), mWrappedAdapter.getItemCount());
+        if (wrappedAdapter != null && wrappedAdapter.getItemCount() > 0) {
+            notifyItemRangeRemoved(getHeaderCount(), wrappedAdapter.getItemCount());
         }
         setWrappedAdapter(adapter);
-        notifyItemRangeInserted(getHeaderCount(), mWrappedAdapter.getItemCount());
+        notifyItemRangeInserted(getHeaderCount(), wrappedAdapter.getItemCount());
     }
 
     @Override
@@ -69,9 +69,9 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
         if (position < hCount) {
             return HEADERS_START + position;
         } else {
-            int itemCount = mWrappedAdapter.getItemCount();
+            int itemCount = wrappedAdapter.getItemCount();
             if (position < hCount + itemCount) {
-                return getAdapterTypeOffset() + mWrappedAdapter.getItemViewType(position - hCount);
+                return getAdapterTypeOffset() + wrappedAdapter.getItemViewType(position - hCount);
             } else {
                 return FOOTERS_START + position - hCount - itemCount;
             }
@@ -81,28 +81,32 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         if (viewType < HEADERS_START + getHeaderCount())
-            return new HeaderViewHolder(mHeaderViews.get(viewType - HEADERS_START));
+            return new HeaderViewHolder(headerViews.get(viewType - HEADERS_START));
         else if (viewType < FOOTERS_START + getFooterCount())
-            return new FooterViewHolder(mFooterViews.get(viewType - FOOTERS_START));
+            return new FooterViewHolder(footerViews.get(viewType - FOOTERS_START));
         else {
-            return mWrappedAdapter.onCreateViewHolder(viewGroup, viewType - getAdapterTypeOffset());
+            return wrappedAdapter.onCreateViewHolder(viewGroup, viewType - getAdapterTypeOffset());
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        int hCount = getHeaderCount();
-        int itemCount = mWrappedAdapter.getItemCount();
-        if (position >= hCount && position < hCount + itemCount) {
-            mWrappedAdapter.onBindViewHolder(viewHolder, position - hCount);
-        } else if(position > hCount + itemCount) {
+        int headerCount = getHeaderCount();
+        int itemCount = wrappedAdapter.getItemCount();
+        if (position < headerCount) {
+            HeaderViewHolder headerViewHolder = (HeaderViewHolder) viewHolder;
+            ViewGroup.LayoutParams lp = headerViewHolder.itemView.getLayoutParams();
+            RecyclerView recyclerView = (RecyclerView) headerViewHolder.itemView.getParent();
+            lp.width = recyclerView.getWidth() - recyclerView.getPaddingLeft() - recyclerView.getPaddingRight();
+            headerViewHolder.itemView.setLayoutParams(lp);
+        } else if (position < headerCount + itemCount) {
+            wrappedAdapter.onBindViewHolder(viewHolder, position - headerCount);
+        } else {
             FooterViewHolder footerViewHolder = (FooterViewHolder) viewHolder;
             ViewGroup.LayoutParams lp = footerViewHolder.itemView.getLayoutParams();
             RecyclerView recyclerView = (RecyclerView) footerViewHolder.itemView.getParent();
             lp.width = recyclerView.getWidth() - recyclerView.getPaddingLeft() - recyclerView.getPaddingRight();
             footerViewHolder.itemView.setLayoutParams(lp);
-        } else {
-
         }
     }
 
@@ -113,7 +117,7 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
      * @param view The header view to add
      */
     public void addHeaderView(View view) {
-        mHeaderViews.add(view);
+        headerViews.add(view);
     }
 
     /**
@@ -123,7 +127,7 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
      * @param view The footer view to add
      */
     public void addFooterView(View view) {
-        mFooterViews.add(view);
+        footerViews.add(view);
     }
 
     @Override
@@ -135,45 +139,45 @@ public class PullLoadAndRefreshRecyclerViewAdapter extends RecyclerView.Adapter<
      * @return The item count in the underlying adapter
      */
     public int getWrappedItemCount() {
-        return mWrappedAdapter.getItemCount();
+        return wrappedAdapter.getItemCount();
     }
 
     /**
      * @return The number of header views added
      */
     public int getHeaderCount() {
-        return mHeaderViews.size();
+        return headerViews.size();
     }
 
     /**
      * @return The number of footer views added
      */
     public int getFooterCount() {
-        return mFooterViews.size();
+        return footerViews.size();
     }
 
     private void setWrappedAdapter(RecyclerView.Adapter adapter) {
-        if (mWrappedAdapter != null) {
-            mWrappedAdapter.unregisterAdapterDataObserver(mDataObserver);
+        if (wrappedAdapter != null) {
+            wrappedAdapter.unregisterAdapterDataObserver(mDataObserver);
         }
-        mWrappedAdapter = adapter;
-        Class adapterClass = mWrappedAdapter.getClass();
-        if (!mItemTypesOffset.containsKey(adapterClass)) {
+        wrappedAdapter = adapter;
+        Class adapterClass = wrappedAdapter.getClass();
+        if (!itemTypesOffset.containsKey(adapterClass)) {
             putAdapterTypeOffset(adapterClass);
         }
-        mWrappedAdapter.registerAdapterDataObserver(mDataObserver);
+        wrappedAdapter.registerAdapterDataObserver(mDataObserver);
     }
 
     public RecyclerView.Adapter getWrappedAdapter() {
-        return mWrappedAdapter;
+        return wrappedAdapter;
     }
 
     private void putAdapterTypeOffset(Class adapterClass) {
-        mItemTypesOffset.put(adapterClass, ITEMS_START + mItemTypesOffset.size() * ADAPTER_MAX_TYPES);
+        itemTypesOffset.put(adapterClass, ITEMS_START + itemTypesOffset.size() * ADAPTER_MAX_TYPES);
     }
 
     private int getAdapterTypeOffset() {
-        return mItemTypesOffset.get(mWrappedAdapter.getClass());
+        return itemTypesOffset.get(wrappedAdapter.getClass());
     }
 
     private static class FooterViewHolder extends RecyclerView.ViewHolder {

@@ -13,46 +13,44 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
     private static final int BASE_ITEM_TYPE_HEADER = 100000;
     private static final int BASE_ITEM_TYPE_FOOTER = 200000;
 
-    private SparseArrayCompat<View> mHeaderViews = new SparseArrayCompat<>();
-    private SparseArrayCompat<View> mFootViews = new SparseArrayCompat<>();
+    private SparseArrayCompat<View> headerViews = new SparseArrayCompat<>();
+    private SparseArrayCompat<View> footerViews = new SparseArrayCompat<>();
 
-    private RecyclerView.Adapter mInnerAdapter;
+    private RecyclerView.Adapter innerAdapter;
 
     public HeaderAndFooterWrapper(RecyclerView.Adapter adapter) {
-        mInnerAdapter = adapter;
+        innerAdapter = adapter;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (mHeaderViews.get(viewType) != null) {
-            View headerView = mHeaderViews.get(viewType);
+        if (headerViews.get(viewType) != null) {
+            View headerView = headerViews.get(viewType);
             ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             headerView.setLayoutParams(lp);
-            CommonRecyclerViewHolder holder = CommonRecyclerViewHolder.createViewHolder(parent.getContext(), headerView);
-            return holder;
+            return CommonRecyclerViewHolder.createViewHolder(parent.getContext(), headerView);
 
-        } else if (mFootViews.get(viewType) != null) {
-            View footerView = mFootViews.get(viewType);
+        } else if (footerViews.get(viewType) != null) {
+            View footerView = footerViews.get(viewType);
             ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             footerView.setLayoutParams(lp);
-            CommonRecyclerViewHolder holder = CommonRecyclerViewHolder.createViewHolder(parent.getContext(), footerView);
-            return holder;
+            return CommonRecyclerViewHolder.createViewHolder(parent.getContext(), footerView);
         }
-        return mInnerAdapter.onCreateViewHolder(parent, viewType);
+        return innerAdapter.onCreateViewHolder(parent, viewType);
     }
 
     @Override
     public int getItemViewType(int position) {
         if (isHeaderViewPos(position)) {
-            return mHeaderViews.keyAt(position);
+            return headerViews.keyAt(position);
         } else if (isFooterViewPos(position)) {
-            return mFootViews.keyAt(position - getHeadersCount() - getRealItemCount());
+            return footerViews.keyAt(position - getHeadersCount() - getRealItemCount());
         }
-        return mInnerAdapter.getItemViewType(position - getHeadersCount());
+        return innerAdapter.getItemViewType(position - getHeadersCount());
     }
 
     private int getRealItemCount() {
-        return mInnerAdapter.getItemCount();
+        return innerAdapter.getItemCount();
     }
 
 
@@ -64,7 +62,7 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
         if (isFooterViewPos(position)) {
             return;
         }
-        mInnerAdapter.onBindViewHolder(holder, position - getHeadersCount());
+        innerAdapter.onBindViewHolder(holder, position - getHeadersCount());
     }
 
     @Override
@@ -74,13 +72,13 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        WrapperUtils.onAttachedToRecyclerView(mInnerAdapter, recyclerView, new WrapperUtils.SpanSizeCallback() {
+        WrapperUtils.onAttachedToRecyclerView(innerAdapter, recyclerView, new WrapperUtils.SpanSizeCallback() {
             @Override
             public int getSpanSize(GridLayoutManager layoutManager, GridLayoutManager.SpanSizeLookup oldLookup, int position) {
                 int viewType = getItemViewType(position);
-                if (mHeaderViews.get(viewType) != null) {
+                if (headerViews.get(viewType) != null) {
                     return layoutManager.getSpanCount();
-                } else if (mFootViews.get(viewType) != null) {
+                } else if (footerViews.get(viewType) != null) {
                     return layoutManager.getSpanCount();
                 }
                 if (oldLookup != null)
@@ -92,7 +90,7 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
-        mInnerAdapter.onViewAttachedToWindow(holder);
+        innerAdapter.onViewAttachedToWindow(holder);
         int position = holder.getLayoutPosition();
         if (isHeaderViewPos(position) || isFooterViewPos(position)) {
             WrapperUtils.setFullSpan(holder);
@@ -109,18 +107,18 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
 
 
     public void addHeaderView(View view) {
-        mHeaderViews.put(mHeaderViews.size() + BASE_ITEM_TYPE_HEADER, view);
+        headerViews.put(headerViews.size() + BASE_ITEM_TYPE_HEADER, view);
     }
 
-    public void addFootView(View view) {
-        mFootViews.put(mFootViews.size() + BASE_ITEM_TYPE_FOOTER, view);
+    public void addFooterView(View view) {
+        footerViews.put(footerViews.size() + BASE_ITEM_TYPE_FOOTER, view);
     }
 
     public int getHeadersCount() {
-        return mHeaderViews.size();
+        return headerViews.size();
     }
 
     public int getFootersCount() {
-        return mFootViews.size();
+        return footerViews.size();
     }
 }

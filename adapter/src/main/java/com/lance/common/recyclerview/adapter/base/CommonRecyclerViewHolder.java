@@ -37,14 +37,12 @@ public class CommonRecyclerViewHolder extends RecyclerView.ViewHolder {
     }
 
     public static CommonRecyclerViewHolder createViewHolder(Context context, View itemView) {
-        CommonRecyclerViewHolder holder = new CommonRecyclerViewHolder(context, itemView);
-        return holder;
+        return new CommonRecyclerViewHolder(context, itemView);
     }
 
     public static CommonRecyclerViewHolder createViewHolder(Context context, ViewGroup parent, int layoutId) {
         View itemView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-        CommonRecyclerViewHolder holder = new CommonRecyclerViewHolder(context, itemView);
-        return holder;
+        return new CommonRecyclerViewHolder(context, itemView);
     }
 
     public <T extends View> T getView(int viewId) {

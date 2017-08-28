@@ -12,17 +12,17 @@ import com.lance.common.recyclerview.adapter.utils.WrapperUtils;
 public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int ITEM_TYPE_EMPTY = Integer.MAX_VALUE - 1;
 
-    private RecyclerView.Adapter mInnerAdapter;
-    private View mEmptyView;
-    private int mEmptyLayoutId;
+    private RecyclerView.Adapter innerAdapter;
+    private View emptyView;
+    private int emptyViewLayoutId;
 
 
     public EmptyWrapper(RecyclerView.Adapter adapter) {
-        mInnerAdapter = adapter;
+        innerAdapter = adapter;
     }
 
     private boolean isEmpty() {
-        return (mEmptyView != null || mEmptyLayoutId != 0) && mInnerAdapter.getItemCount() == 0;
+        return (emptyView != null || emptyViewLayoutId != 0) && innerAdapter.getItemCount() == 0;
     }
 
 
@@ -30,19 +30,19 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (isEmpty()) {
             CommonRecyclerViewHolder holder;
-            if (mEmptyView != null) {
-                holder = CommonRecyclerViewHolder.createViewHolder(parent.getContext(), mEmptyView);
+            if (emptyView != null) {
+                holder = CommonRecyclerViewHolder.createViewHolder(parent.getContext(), emptyView);
             } else {
-                holder = CommonRecyclerViewHolder.createViewHolder(parent.getContext(), parent, mEmptyLayoutId);
+                holder = CommonRecyclerViewHolder.createViewHolder(parent.getContext(), parent, emptyViewLayoutId);
             }
             return holder;
         }
-        return mInnerAdapter.onCreateViewHolder(parent, viewType);
+        return innerAdapter.onCreateViewHolder(parent, viewType);
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        WrapperUtils.onAttachedToRecyclerView(mInnerAdapter, recyclerView, new WrapperUtils.SpanSizeCallback() {
+        WrapperUtils.onAttachedToRecyclerView(innerAdapter, recyclerView, new WrapperUtils.SpanSizeCallback() {
             @Override
             public int getSpanSize(GridLayoutManager gridLayoutManager, GridLayoutManager.SpanSizeLookup oldLookup, int position) {
                 if (isEmpty()) {
@@ -58,7 +58,7 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
-        mInnerAdapter.onViewAttachedToWindow(holder);
+        innerAdapter.onViewAttachedToWindow(holder);
         if (isEmpty()) {
             WrapperUtils.setFullSpan(holder);
         }
@@ -70,7 +70,7 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (isEmpty()) {
             return ITEM_TYPE_EMPTY;
         }
-        return mInnerAdapter.getItemViewType(position);
+        return innerAdapter.getItemViewType(position);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (isEmpty()) {
             return;
         }
-        mInnerAdapter.onBindViewHolder(holder, position);
+        innerAdapter.onBindViewHolder(holder, position);
     }
 
     @Override
@@ -86,14 +86,14 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (isEmpty()) {
             return 1;
         }
-        return mInnerAdapter.getItemCount();
+        return innerAdapter.getItemCount();
     }
 
     public void setEmptyView(View emptyView) {
-        mEmptyView = emptyView;
+        this.emptyView = emptyView;
     }
 
     public void setEmptyView(int layoutId) {
-        mEmptyLayoutId = layoutId;
+        emptyViewLayoutId = layoutId;
     }
 }
