@@ -22,7 +22,7 @@ import android.widget.TextView;
  * 适用于AdapterView的通用ViewHolder
  */
 public class ViewHolder {
-    private SparseArray<View> mViews;
+    private SparseArray<View> views;
     private int mPosition;
     private View mConvertView;
     private Context mContext;
@@ -32,7 +32,7 @@ public class ViewHolder {
         mContext = context;
         mConvertView = itemView;
         mPosition = position;
-        mViews = new SparseArray<>();
+        views = new SparseArray<>();
         mConvertView.setTag(this);
     }
 
@@ -51,10 +51,10 @@ public class ViewHolder {
     }
 
     public <T extends View> T getView(int viewId) {
-        View view = mViews.get(viewId);
+        View view = views.get(viewId);
         if (view == null) {
             view = mConvertView.findViewById(viewId);
-            mViews.put(viewId, view);
+            views.put(viewId, view);
         }
         return (T) view;
     }
