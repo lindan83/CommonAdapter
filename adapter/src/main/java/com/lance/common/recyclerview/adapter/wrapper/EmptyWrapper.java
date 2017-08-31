@@ -8,14 +8,15 @@ import android.view.ViewGroup;
 import com.lance.common.recyclerview.adapter.base.CommonRecyclerViewHolder;
 import com.lance.common.recyclerview.adapter.utils.WrapperUtils;
 
-
-public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+/**
+ * 空视图
+ */
+public class EmptyWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int ITEM_TYPE_EMPTY = Integer.MAX_VALUE - 1;
 
     private RecyclerView.Adapter innerAdapter;
     private View emptyView;
     private int emptyViewLayoutId;
-
 
     public EmptyWrapper(RecyclerView.Adapter adapter) {
         innerAdapter = adapter;
@@ -24,7 +25,6 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private boolean isEmpty() {
         return (emptyView != null || emptyViewLayoutId != 0) && innerAdapter.getItemCount() == 0;
     }
-
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -89,11 +89,19 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return innerAdapter.getItemCount();
     }
 
-    public void setEmptyView(View emptyView) {
+    /**
+     * 设置自定义EmptyView
+     */
+    public EmptyWrapper setEmptyView(View emptyView) {
         this.emptyView = emptyView;
+        return this;
     }
 
-    public void setEmptyView(int layoutId) {
+    /**
+     * 设置自定义EmptyView
+     */
+    public EmptyWrapper setEmptyView(int layoutId) {
         emptyViewLayoutId = layoutId;
+        return this;
     }
 }

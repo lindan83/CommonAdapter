@@ -9,9 +9,12 @@ import android.view.ViewGroup;
 import com.lance.common.recyclerview.adapter.base.CommonRecyclerViewHolder;
 import com.lance.common.recyclerview.adapter.utils.WrapperUtils;
 
-public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final int BASE_ITEM_TYPE_HEADER = 100000;
-    private static final int BASE_ITEM_TYPE_FOOTER = 200000;
+/**
+ * 支持HeaderView和FooterView
+ */
+public class HeaderAndFooterWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static final int BASE_ITEM_TYPE_HEADER = 100000;
+    public static final int BASE_ITEM_TYPE_FOOTER = 200000;
 
     private SparseArrayCompat<View> headerViews = new SparseArrayCompat<>();
     private SparseArrayCompat<View> footerViews = new SparseArrayCompat<>();
@@ -24,14 +27,14 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (headerViews.get(viewType) != null) {
-            View headerView = headerViews.get(viewType);
+        View headerView = headerViews.get(viewType);
+        if (headerView != null) {
             ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             headerView.setLayoutParams(lp);
             return CommonRecyclerViewHolder.createViewHolder(parent.getContext(), headerView);
-
-        } else if (footerViews.get(viewType) != null) {
-            View footerView = footerViews.get(viewType);
+        }
+        View footerView = footerViews.get(viewType);
+        if (footerView != null) {
             ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             footerView.setLayoutParams(lp);
             return CommonRecyclerViewHolder.createViewHolder(parent.getContext(), footerView);
@@ -49,6 +52,7 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
         return innerAdapter.getItemViewType(position - getHeadersCount());
     }
 
+    //获取真实数据项数量
     private int getRealItemCount() {
         return innerAdapter.getItemCount();
     }
@@ -56,10 +60,7 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (isHeaderViewPos(position)) {
-            return;
-        }
-        if (isFooterViewPos(position)) {
+        if (isHeaderViewPos(position) || isFooterViewPos(position)) {
             return;
         }
         innerAdapter.onBindViewHolder(holder, position - getHeadersCount());
@@ -81,8 +82,9 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
                 } else if (footerViews.get(viewType) != null) {
                     return layoutManager.getSpanCount();
                 }
-                if (oldLookup != null)
+                if (oldLookup != null) {
                     return oldLookup.getSpanSize(position);
+                }
                 return 1;
             }
         });
@@ -97,27 +99,42 @@ public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView
         }
     }
 
+    //判断指定position是否HeaderView的位置
     private boolean isHeaderViewPos(int position) {
         return position < getHeadersCount();
     }
 
+    //判断指定position是否FooterView的位置
     private boolean isFooterViewPos(int position) {
         return position >= getHeadersCount() + getRealItemCount();
     }
 
-
-    public void addHeaderView(View view) {
+    /**
+     * 添加自定义HeaderView
+     */
+    public HeaderAndFooterWrapper addHeaderView(View view) {
         headerViews.put(headerViews.size() + BASE_ITEM_TYPE_HEADER, view);
+        return this;
     }
 
-    public void addFooterView(View view) {
+    /**
+     * 添加自定义FooterView
+     */
+    public HeaderAndFooterWrapper addFooterView(View view) {
         footerViews.put(footerViews.size() + BASE_ITEM_TYPE_FOOTER, view);
+        return this;
     }
 
+    /**
+     * 获取HeaderView数量
+     */
     public int getHeadersCount() {
         return headerViews.size();
     }
 
+    /**
+     * 获取FooterView数量
+     */
     public int getFootersCount() {
         return footerViews.size();
     }

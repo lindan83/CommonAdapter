@@ -69,6 +69,9 @@ public class RecyclerViewLoadMoreDemoActivity extends AppCompatActivity {
         mLoadMoreWrapper.setOnLoadMoreListener(new LoadMoreWrapper.OnLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
+                if(mPageIndex > 3) {
+                    return;
+                }
                 loadData(false);
             }
         });
@@ -101,7 +104,7 @@ public class RecyclerViewLoadMoreDemoActivity extends AppCompatActivity {
         TextView t2 = (TextView) LayoutInflater.from(this).inflate(R.layout.layout_footer, null);
         t2.setText("Footer 1");
         mHeaderAndFooterWrapper.addHeaderView(t1);
-        mHeaderAndFooterWrapper.addFootView(t2);
+        mHeaderAndFooterWrapper.addFooterView(t2);
     }
 
     @Override
