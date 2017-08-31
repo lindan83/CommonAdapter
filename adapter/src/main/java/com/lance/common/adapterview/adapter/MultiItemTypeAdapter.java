@@ -13,9 +13,7 @@ import java.util.List;
 public class MultiItemTypeAdapter<T> extends BaseAdapter {
     protected Context context;
     protected List<T> data;
-
     private ItemViewDelegateManager itemViewDelegateManager;
-
 
     public MultiItemTypeAdapter(Context context, List<T> data) {
         this.context = context;
@@ -43,8 +41,7 @@ public class MultiItemTypeAdapter<T> extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         if (useItemViewDelegateManager()) {
-            int viewType = itemViewDelegateManager.getItemViewType(data.get(position), position);
-            return viewType;
+            return itemViewDelegateManager.getItemViewType(data.get(position), position);
         }
         return super.getItemViewType(position);
     }

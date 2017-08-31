@@ -23,17 +23,17 @@ import android.widget.TextView;
  */
 public class ViewHolder {
     private SparseArray<View> views;
-    private int mPosition;
-    private View mConvertView;
-    private Context mContext;
-    private int mLayoutId;
+    private int position;
+    private View convertView;
+    private Context context;
+    private int layoutId;
 
     private ViewHolder(Context context, View itemView, int position) {
-        mContext = context;
-        mConvertView = itemView;
-        mPosition = position;
+        this.context = context;
+        convertView = itemView;
+        this.position = position;
         views = new SparseArray<>();
-        mConvertView.setTag(this);
+        convertView.setTag(this);
     }
 
 
@@ -41,11 +41,11 @@ public class ViewHolder {
         if (convertView == null) {
             View itemView = LayoutInflater.from(context).inflate(layoutId, parent, false);
             ViewHolder holder = new ViewHolder(context, itemView, position);
-            holder.mLayoutId = layoutId;
+            holder.layoutId = layoutId;
             return holder;
         } else {
             ViewHolder holder = (ViewHolder) convertView.getTag();
-            holder.mPosition = position;
+            holder.position = position;
             return holder;
         }
     }
@@ -53,26 +53,26 @@ public class ViewHolder {
     public <T extends View> T getView(int viewId) {
         View view = views.get(viewId);
         if (view == null) {
-            view = mConvertView.findViewById(viewId);
+            view = convertView.findViewById(viewId);
             views.put(viewId, view);
         }
         return (T) view;
     }
 
     public View getConvertView() {
-        return mConvertView;
+        return convertView;
     }
 
     public int getLayoutId() {
-        return mLayoutId;
+        return layoutId;
     }
 
     public void updatePosition(int position) {
-        mPosition = position;
+        this.position = position;
     }
 
     public int getItemPosition() {
-        return mPosition;
+        return position;
     }
 
     public ViewHolder setText(int viewId, String text) {
@@ -119,7 +119,7 @@ public class ViewHolder {
 
     public ViewHolder setTextColorRes(int viewId, int textColorRes) {
         TextView view = getView(viewId);
-        view.setTextColor(mContext.getResources().getColor(textColorRes));
+        view.setTextColor(context.getResources().getColor(textColorRes));
         return this;
     }
 

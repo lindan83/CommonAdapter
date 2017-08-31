@@ -5,7 +5,7 @@ import android.support.v4.util.SparseArrayCompat;
 import com.lance.common.adapterview.adapter.ViewHolder;
 
 public class ItemViewDelegateManager<T> {
-    SparseArrayCompat<ItemViewDelegate<T>> delegates = new SparseArrayCompat();
+    private SparseArrayCompat<ItemViewDelegate<T>> delegates = new SparseArrayCompat<>();
 
     public int getItemViewDelegateCount() {
         return delegates.size();
